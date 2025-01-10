@@ -1,0 +1,20 @@
+{
+    "name": "VbgAssetPackEditorTools",
+    "rootNamespace": "",
+    "references": [
+        "GUID:5e7ba8d6d26c84943b64dd07bd1c9510",
+        "GUID:a42927d1d4a3b4cda9b076a7adecb9cc",
+        "GUID:0f9e8f73c69964f1e8176f9a0b86f9b2"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

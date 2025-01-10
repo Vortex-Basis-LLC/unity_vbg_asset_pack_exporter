@@ -1,0 +1,6 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/VbgAssetPackExporter/Editor/ExportAssetPackEditorWindow.uss?fileID=7433441132597879392&amp;guid=02dfddd3921894e6e801ce5456c302ce&amp;type=3#ExportAssetPackEditorWindow" />
+    <engine:TextField label="Target Export Folder" placeholder-text="Folder in which to save asset pack" name="target_export_folder" />
+    <engine:TextField label="Asset Folder" placeholder-text="Source folder in Assets" name="asset_folder" />
+    <engine:Button text="Export Asset Pack" name="export_button" />
+</engine:UXML>
