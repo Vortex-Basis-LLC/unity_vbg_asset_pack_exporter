@@ -349,6 +349,9 @@ public class AssetPackExporter
             {
                 string meshFilename = go.name + ".glb";
                 string relMeshFilename = Path.Combine(srcFolderRelativeFolder, meshFilename);
+
+                Debug.Log("EXPORT GLTF: " + relMeshFilename);
+
                 ExportToGltfAsync(new[] { go }, relMeshFilename);
 
                 // Need to add separate entries for child meshes of this game object.
@@ -556,22 +559,42 @@ public class AssetPackExporter
 
         if (PrefabUtility.GetPrefabInstanceStatus(go) == PrefabInstanceStatus.Connected)
         {
+            var sourceObject = PrefabUtility.GetCorrespondingObjectFromSource(go);
+            string sourceObjectPath = AssetDatabase.GetAssetPath(sourceObject);
+
             // Handle Prefab reference. 
             // TODO: Check for overridden values and pass those along in some fashion.
             //   See PrefabUtility.GetPropertyModifications(go);
 
-            string prefabAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
-            string prefabName = Path.GetFileNameWithoutExtension(prefabAssetPath);
+            // string prefabAssetPath = PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(go);
+            // string prefabName = Path.GetFileNameWithoutExtension(prefabAssetPath);
+
+            // TODO: Include path? Special handling for mesh references?
+            string sceneRefName = Path.GetFileNameWithoutExtension(sourceObjectPath);
             
             var sceneRef = new AssetPackSceneRef
             {
                 // TODO: Consider storing full asset path instead (would need to add that to the scene node as a source path perhaps)
                 // TOOD: Might need to do multiple passes depending on how we have these point back and forth.
-                Name = prefabName
+                Name = sceneRefName
             };
             node.SceneRef = sceneRef;
 
             // TODO: Look for added or modified child nodes.
+
+            if (go.TryGetComponent<MeshRenderer>(out var meshRenderer))
+            {
+                MeshRenderer prefabMeshRenderer = null;
+                if (sourceObject != null)
+                {
+                    sourceObject.TryGetComponent<MeshRenderer>(out prefabMeshRenderer);
+                }
+
+                // TODO: See if there's a difference between the ones on mesh renderer and the source object?
+                var matList = new List<Material>();
+                meshRenderer.GetSharedMaterials(matList);
+                node.Materials = GetMaterialRefListForNodeMaterials(matList);
+            }
         } 
         else
         {
