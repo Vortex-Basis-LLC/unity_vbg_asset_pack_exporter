@@ -52,9 +52,17 @@ class AssetPackSceneNode
     public AssetPackSceneRef SceneRef { get; set; }
 
     public AssetPackMeshRef Mesh { get; set; }
-    public AssetPackMeshRef Collider { get; set; }
+    public AssetPackMeshCollider MeshCollider { get; set; }
     public AssetPackMaterialRef[] Materials { get; set; }
 }
+
+
+class AssetPackMeshCollider
+{
+    public bool Convex { get; set;}
+    public AssetPackMeshRef Mesh { get; set; }
+}
+
 
 class AssetPackVector3
 {

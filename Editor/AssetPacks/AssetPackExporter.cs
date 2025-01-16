@@ -30,6 +30,11 @@ public class AssetPackExporter
     /// </summary>
     public string TargetFolder { get; set; } 
 
+    /// <summary>
+    /// Attempt to considate meshes into fewer files.
+    /// </summary>
+    public bool ConsolidateMeshes { get; set; } = true;
+
     private AssetPackLibrary assetPackLibrary;
     private string targetImageFolder;
     private string targetMeshFolder;
@@ -310,6 +315,9 @@ public class AssetPackExporter
     {
         string root = Path.Combine(Application.dataPath, SourceFolderInAssets);
 
+        var  meshExportAccumulator = new MeshExportAccumulator();
+        meshExportAccumulator.TargetFolder = Path.Combine(TargetFolder, "mesh");
+
         List<AssetPackMesh> meshList = new List<AssetPackMesh>();
 
         string[] files = Directory.GetFiles(root, "*.*", SearchOption.AllDirectories);
@@ -348,11 +356,14 @@ public class AssetPackExporter
             if (useGltfFile)
             {
                 string meshFilename = go.name + ".glb";
-                string relMeshFilename = Path.Combine(srcFolderRelativeFolder, meshFilename);
+                //string relMeshFilename = Path.Combine(srcFolderRelativeFolder, meshFilename);
 
-                Debug.Log("EXPORT GLTF: " + relMeshFilename);
+                //Debug.Log("EXPORT GLTF: " + relMeshFilename);
 
-                ExportToGltfAsync(new[] { go }, relMeshFilename);
+                string meshFile = meshExportAccumulator.AddGameObject(go);
+                string relMeshFile = Path.GetRelativePath(meshExportAccumulator.TargetFolder, meshFile);
+
+                // ExportToGltfAsync(new[] { go }, relMeshFilename);
 
                 // Need to add separate entries for child meshes of this game object.
                 List<string> allMeshNames = new List<string>();
@@ -366,7 +377,8 @@ public class AssetPackExporter
                         var meshInfo = new AssetPackMesh
                         {
                             Name = meshName,
-                            PackFile = relMeshFilename,
+                            Folder = srcFolderRelativeFolder,
+                            PackFile = relMeshFile,
                             PackFileNode = meshName
                         };
 
@@ -385,6 +397,7 @@ public class AssetPackExporter
                 var meshInfo = new AssetPackMesh
                 {
                     Name = meshName,
+                    Folder = srcFolderRelativeFolder,
                     PackFile = meshName + ".fbx",
                     PackFileNode = go.name
                 };
@@ -402,6 +415,8 @@ public class AssetPackExporter
                 meshList.Add(meshInfo);
             }
         }
+
+        meshExportAccumulator.Flush();
 
         var meshLib = new AssetPackMeshLibrary
         {
@@ -595,6 +610,22 @@ public class AssetPackExporter
                 meshRenderer.GetSharedMaterials(matList);
                 node.Materials = GetMaterialRefListForNodeMaterials(matList);
             }
+
+            if (go.TryGetComponent<MeshCollider>(out var meshCollider))
+            {
+                // TODO: See if different than underlying object...?
+
+                if (meshCollider.sharedMesh != null)
+                {
+                    node.MeshCollider = new AssetPackMeshCollider
+                    {
+                        Mesh = new AssetPackMeshRef
+                        {
+                            Name = meshCollider.sharedMesh.name
+                        } 
+                    };
+                }
+            }
         } 
         else
         {
@@ -660,9 +691,12 @@ public class AssetPackExporter
             {
                 if (meshCollider.sharedMesh != null)
                 {
-                    node.Collider = new AssetPackMeshRef
+                    node.MeshCollider = new AssetPackMeshCollider
                     {
-                        Name = meshCollider.sharedMesh.name
+                        Mesh = new AssetPackMeshRef
+                        {
+                            Name = meshCollider.sharedMesh.name
+                        } 
                     };
                 }
             }
