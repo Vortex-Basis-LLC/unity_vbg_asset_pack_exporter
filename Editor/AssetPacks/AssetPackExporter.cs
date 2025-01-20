@@ -626,6 +626,34 @@ public class AssetPackExporter
                     };
                 }
             }
+
+            // Collect any added game objects.
+            var addedGameObjects = PrefabUtility.GetAddedGameObjects(go);
+            if ((addedGameObjects?.Count ?? 0) > 0)
+            {
+                var addedNodes = new List<AssetPackSceneNode>();
+                foreach (var addedChild in addedGameObjects)
+                {
+                    // TODO: Include sibling index?
+                    var addedChildSceneNode = GetSceneNode(addedChild.instanceGameObject);
+                    addedNodes.Add(addedChildSceneNode);
+                }
+                node.SceneRef.AddedChildren = addedNodes;
+            }
+
+            var removedGameObjects = PrefabUtility.GetRemovedGameObjects(go);
+            if ((removedGameObjects?.Count ?? 0) > 0)
+            {
+                var removedChildren = new List<string>();
+                foreach (var removedChild in removedGameObjects)
+                {
+                    // TODO: Check how this actually works in a hierarchy. 
+                    //    Do we need to do something with? removedChild.parentOfRemovedGameObjectInInstance
+                    string removedChildName = removedChild.assetGameObject.name;
+                    removedChildren.Add(removedChildName);
+                }
+                node.SceneRef.RemovedChildren = removedChildren;
+            }
         } 
         else
         {

@@ -41,6 +41,24 @@ public class VbgAssetPackEditorToolsMenu
             var addedGameObjects = PrefabUtility.GetAddedGameObjects(go);
             Debug.Log("AddedComponents: " + addedComponents.Count + ", AddedGameObjects:" + addedGameObjects.Count + ", Overrides: " + overrides.Count);
 
+            if (addedComponents.Count > 0)
+            {
+                Debug.Log("Added Components:");
+                foreach (var addedComponent in addedComponents)
+                {
+                    Debug.Log("   Added: " + addedComponent.instanceComponent.name + ": " + addedComponent.instanceComponent.GetType().FullName);
+                }
+            }
+
+            if (addedGameObjects.Count > 0)
+            {
+                Debug.Log("Added Game Objects:");
+                foreach (var addedGo in addedGameObjects)
+                {
+                    Debug.Log("   Added: " + addedGo.instanceGameObject.name);
+                }
+            }
+
             //if (PrefabUtility.IsOutermostPrefabInstanceRoot(go))
             {
                 var prefabParent = EditorUtility.GetPrefabParent(go);

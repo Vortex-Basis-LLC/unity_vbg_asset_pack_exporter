@@ -28,6 +28,9 @@ class AssetPackScene
 class AssetPackSceneRef
 {
     public string Name { get; set; }
+
+    public List<AssetPackSceneNode> AddedChildren { get; set; }
+    public List<string> RemovedChildren { get; set; }
 }
 
 
